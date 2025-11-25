@@ -17,41 +17,12 @@ const initGroq = () => {
 };
 
 let groqClient = null;
-let cachedModel = null;
 
 const getGroqClient = () => {
   if (!groqClient) {
     groqClient = initGroq();
   }
   return groqClient;
-};
-
-// ✅ Função para listar modelos disponíveis
-const getAvailableModel = async () => {
-  if (cachedModel) {
-    return cachedModel;
-  }
-
-  try {
-    const client = getGroqClient();
-    const models = await client.models.list();
-    
-    logger.info(`Available models: ${models.data.map(m => m.id).join(", ")}`);
-    
-    // ✅ Usar o primeiro modelo disponível
-    if (models.data && models.data.length > 0) {
-      cachedModel = models.data[0].id;
-      logger.info(`Selected model: ${cachedModel}`);
-      return cachedModel;
-    }
-    
-    throw new Error("No models available");
-  } catch (error) {
-    logger.error("Error listing models:", error);
-    // ✅ Fallback: usar modelo padrão
-    logger.warn("Falling back to default model: mixtral-8x7b-32768");
-    return "mixtral-8x7b-32768";
-  }
 };
 
 export const generateRunnerGameConfig = async (userDescription) => {
@@ -61,8 +32,8 @@ export const generateRunnerGameConfig = async (userDescription) => {
     const client = getGroqClient();
     logger.info("Groq client initialized successfully");
     
-    // ✅ Obter modelo dinamicamente
-    const model = await getAvailableModel();
+    // ✅ Usar modelo que SEMPRE funciona
+    const model = "llama-3.1-8b-instant";
     logger.info(`Using model: ${model}`);
     
     const message = await client.chat.completions.create({
