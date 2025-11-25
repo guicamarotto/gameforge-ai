@@ -36,4 +36,4 @@ npm run dev  # localhost:5173
 
 ![PWA Badge](https://img.shields.io/badge/PWA-Ready-00D1FF?style=flat&logo=electron)
 ![Phaser](https://img.shields.io/badge/Phaser-3.80-FF6384?style=flat&logo=phaser)
-```
+
