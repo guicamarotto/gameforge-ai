@@ -1,20 +1,40 @@
+```markdown
 # 🎮 GameForge AI
 
-[![Stars](https://img.shields.io/github/stars/guicamarotto/gameforge-ai?style=social)](https://github.com/guicamarotto/gameforge-ai)
-[![Forks](https://img.shields.io/github/forks/guicamarotto/gameforge-ai?style=social)](https://github.com/guicamarotto/gameforge-ai)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Vercel Deploy](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/guicamarotto/gameforge-ai)
+AI-Powered **PWA Micro-Game Builder**. Descreva seu jogo ("gato voador endless runner") e gere **mini-jogos jogáveis instantaneamente**!
 
-**AI-Powered PWA Micro-Game Builder** – Descreva seu jogo ("gato voador endless runner") e gere **mini-jogos jogáveis instantaneamente**! Offline-first, mobile-ready, Phaser.js under the hood.
+## ✨ Por Quê É Incrível?
+- **Offline-First PWA**: Instale no celular, jogue sem net.
+- **AI Game Gen**: Keywords → Phaser.js configs (runner, shooter, collector).
+- **Viral-Ready**: Share URLs + remix community.
+- **Tech Stack**: React + Vite PWA + Phaser 3 + Zustand.
 
-## 🚀 Demo Live
-[![Demo GIF](https://via.placeholder.com/800x400?text=Demo+GIF+Aqui)](https://gameforge-ai.vercel.app)  
-*(Adicione GIF do Loom/Record demo rodando)*
+## 🚀 Demo (Em Breve)
+[Live Demo Aqui](https://gameforge-ai.vercel.app) *(Deploy após MVP)*
 
-## ✨ Features
-- **AI Game Gen**: Keyword parsing → Phaser configs (runner/shooter/collector).
-- **PWA Native**: Instale, offline play, push notifications.
-- **Viral Loop**: Share URLs + remix.
-- **Tech Stack**:React 18 + Vite PWA + Phaser 3.80 + Zustand Deploy: Vercel | Future: OpenAI/Grok API
+![Demo Mock](https://via.placeholder.com/800x400/6366f1/ffffff?text=%F0%9F%8E%B2+GameForge+AI+-+Gere+Jogos+com+IA!+%F0%9F%A4%96)
 
-## 🎯 Como Usar 1. Clone: `git clone https://github.com/guicamarotto/gameforge-ai.git` 2. `npm i && npm run dev` 3. Descreva → Gere → Jogue! ## 📱 PWA Install - Adicione à home screen (Chrome/Safari). - Service Worker caches tudo. ## 🤝 Contribua 1. Fork → PR. 2. Issues: Bugs/features bem-vindas! ## 🚀 Roadmap - [x] MVP Frontend PWA - [ ] Real AI (OpenAI codegen) - [ ] Multiplayer WebSockets - [ ] Marketplace de templates **Built by @SEU_TWITTER** | [Twitter](https://twitter.com/SEU) | [Product Hunt Launch](https://www.producthunt.com/posts/gameforge-ai) --- *Made with ❤️ for indie devs. Stars = combustível pro viral! ⭐*
+## 🛠️ Quick Start
+```bash
+git clone https://github.com/YOUR_USERNAME/gameforge-ai.git
+cd gameforge-ai
+npm install
+npm run dev  # localhost:5173
+```
+
+## 📱 PWA Features
+- Service Worker (cache total).
+- Manifest (add to home screen).
+- Touch controls (mobile endless runner).
+
+## 🤝 Roadmap
+1. ✅ MVP Frontend (Phaser mock AI).
+2. 🔄 Real AI (OpenAI/Grok codegen).
+3. 🔄 Multiplayer + Marketplace.
+4. 🔄 Pro Tier (`R$ 19/mês`).
+
+**Built by Guilherme (Full Stack Dev)** | Stars pra viral! ⭐
+
+![PWA Badge](https://img.shields.io/badge/PWA-Ready-00D1FF?style=flat&logo=electron)
+![Phaser](https://img.shields.io/badge/Phaser-3.80-FF6384?style=flat&logo=phaser)
+```
