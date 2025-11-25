@@ -77,7 +77,7 @@ Certifique-se de ter as seguintes ferramentas instaladas:
 1. Clone o Repositório
 
 `bash
-git clone https://github.com/GuilhermeCamarotto/GameForge-AI.git
+git clone https://github.com/guicamarotto/GameForge-AI.git
 cd GameForge-AI
 `
 
@@ -228,13 +228,11 @@ Adoramos contribuições! Se você deseja ajudar a melhorar o GameForge AI, siga
 
 Este projeto está sob a Licença MIT.
 
-Desenvolvedor Principal: Guilherme Camarotto (Full Stack Developer)
+Desenvolvedor Principal: Guilherme Camarotto
 
 ---
 
 📧 Contato e Links
 
-*   Repositório GitHub: https://github.com/GuilhermeCamarotto/GameForge-AI
-*   Demo (se disponível): [Link para a demo online] (Em breve)
-*   Documentação (se disponível): (Em breve)
-*   Contato: guilherme.camarotto@example.com (Substitua pelo seu email real)
+*   Repositório GitHub: https://github.com/guicamarotto/GameForge-AI
+*   Contato: guicamarotto@gmail.com
