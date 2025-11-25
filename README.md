@@ -1,5 +1,4 @@
-```markdown
-# 🎮 GameForge AI
+## 🎮 GameForge AI
 
 AI-Powered **PWA Micro-Game Builder**. Descreva seu jogo ("gato voador endless runner") e gere **mini-jogos jogáveis instantaneamente**!
 
