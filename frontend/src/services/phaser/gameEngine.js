@@ -1,178 +1,208 @@
+// frontend/src/services/phaser/gameEngine.js
+
 import Phaser from 'phaser';
 
-export const createGameConfig = (gameConfig, containerId = 'game-container') => {
-  const config = {
-    type: Phaser.AUTO,
-    parent: containerId,
-    width: 800,
-    height: 600,
-    physics: {
-      default: 'arcade',
-      arcade: {
-        gravity: { y: gameConfig.physics.gravity },
-        debug: false,
-      },
-    },
-    scene: {
-      preload: preload,
-      create: create,
-      update: update,
-      data: { gameConfig }, // ✅ Passar gameConfig aqui
-    },
-  };
+class GameScene extends Phaser.Scene {
 
-  return config;
-};
-
-const preload = function () {
-  // Assets carregados aqui
-};
-
-const create = function () {
-  // ✅ Acessar gameConfig dos dados da scene
-  const gameConfig = this.scene.get(this.scene.key).data.get('gameConfig');
-  
-  if (!gameConfig) {
-    console.error('gameConfig não encontrado!', this.scene.key, this.data);
-    return;
-  }
-
-  this.add.rectangle(
-    400,
-    300,
-    800,
-    600,
-    parseInt(gameConfig.backgroundColor.replace('#', '0x'))
-  );
-
-  const playerGraphics = this.make.graphics({ x: 0, y: 0, add: false });
-  playerGraphics.fillStyle(0xff0000, 1);
-  playerGraphics.fillCircle(25, 25, 20);
-  playerGraphics.generateTexture('playerTexture', 50, 50);
-  playerGraphics.destroy();
-
-  this.player = this.physics.add.sprite(100, 400, 'playerTexture');
-  this.player.setBounce(0.2);
-  this.player.setCollideWorldBounds(true);
-
-  this.obstacles = this.physics.add.group();
-  this.collectibles = this.physics.add.group();
-
-  this.score = 0;
-  this.scoreText = this.add.text(16, 16, 'Score: 0', {
-    fontSize: '32px',
-    fill: '#ffffff',
-  });
-
-  this.cursors = this.input.keyboard.createCursorKeys();
-  this.input.keyboard.on('keydown-SPACE', () => {
-    if (this.player.body.touching.down) {
-      this.player.setVelocityY(-400);
+    constructor(gameConfig) {
+        super('GameScene');
+        this.gameConfig = gameConfig;
     }
-  });
 
-  this.spawnRate = gameConfig.difficulty.spawnRate;
-  this.lastSpawn = 0;
-  this.gameSpeed = gameConfig.physics.obstacleSpeed;
-  this.speedMultiplier = 1;
-  this.gameConfig = gameConfig;
-  this.gameActive = true;
-};
-
-const update = function () {
-  const gameConfig = this.gameConfig;
-
-  if (!this.gameActive) return;
-
-  this.obstacles.children.entries.forEach((obs) => {
-    if (obs.x < -50) {
-      obs.destroy();
-      this.score += gameConfig.scoring.distancePoints;
-      this.scoreText.setText(`Score: ${this.score}`);
+    preload() {
+        // Futuramente você pode carregar sprites reais aqui
     }
-  });
 
-  this.collectibles.children.entries.forEach((col) => {
-    if (col.x < -50) {
-      col.destroy();
+    create() {
+        const gameConfig = this.gameConfig;
+
+        if (!gameConfig) {
+            console.error("gameConfig não encontrado!", this);
+            return;
+        }
+
+        // Habilita teclado
+        this.input.keyboard.enabled = true;
+
+        // Captura da barra de espaço
+        this.spaceKey = this.input.keyboard.addKey(
+            Phaser.Input.Keyboard.KeyCodes.SPACE
+        );
+
+        // Fundo
+        this.add.rectangle(
+            400,
+            300,
+            800,
+            600,
+            parseInt(gameConfig.backgroundColor.replace('#', '0x'))
+        );
+
+        // Player (desenhado dinamicamente)
+        const playerGraphics = this.make.graphics({ x: 0, y: 0, add: false });
+        playerGraphics.fillStyle(0xff0000, 1);
+        playerGraphics.fillCircle(25, 25, 20);
+        playerGraphics.generateTexture('playerTexture', 50, 50);
+        playerGraphics.destroy();
+
+        this.player = this.physics.add.sprite(100, 400, 'playerTexture');
+        this.player.setBounce(0.1);
+        this.player.setCollideWorldBounds(true);
+
+        // ---------- CHÃO INVISÍVEL -----------
+        this.ground = this.physics.add.staticGroup();
+        this.ground
+            .create(400, 590, null)
+            .setDisplaySize(800, 20)
+            .setVisible(false)
+            .refreshBody();
+
+        this.physics.add.collider(this.player, this.ground);
+
+        // Grupos
+        this.obstacles = this.physics.add.group();
+        this.collectibles = this.physics.add.group();
+
+        // Score
+        this.score = 0;
+        this.scoreText = this.add.text(16, 16, 'Score: 0', {
+            fontSize: '32px',
+            fill: '#ffffff'
+        });
+
+        // Controles
+        this.cursors = this.input.keyboard.createCursorKeys();
+
+        // Configuração da lógica
+        this.spawnRate = gameConfig.difficulty.spawnRate;
+        this.lastSpawn = 0;
+        this.speedMultiplier = 1;
+        this.gameActive = true;
     }
-  });
 
-  const now = this.time.now;
-  if (now - this.lastSpawn > this.spawnRate / this.speedMultiplier) {
-    spawnObstacle.call(this, gameConfig);
-    spawnCollectible.call(this, gameConfig);
-    this.lastSpawn = now;
-    this.speedMultiplier += gameConfig.difficulty.speedIncrement;
-  }
+    update() {
+        const gameConfig = this.gameConfig;
+        if (!gameConfig || !this.gameActive) return;
 
-  this.physics.overlap(
-    this.player,
-    this.obstacles,
-    () => {
-      this.physics.pause();
-      this.gameActive = false;
-      this.add.text(250, 250, 'Game Over!', { fontSize: '64px', fill: '#ff0000' });
-      this.add.text(200, 350, `Final Score: ${this.score}`, {
-        fontSize: '32px',
-        fill: '#ffffff',
-      });
+        // ----------------- CONTROLES ------------------
+
+        const isJumpPressed =
+            this.cursors.up.isDown || this.spaceKey.isDown;
+
+        if (isJumpPressed && this.player.body.touching.down) {
+            this.player.setVelocityY(-400);
+        }
+
+        // Movimento lateral
+        if (this.cursors.left.isDown) {
+            this.player.setVelocityX(-150);
+        } else if (this.cursors.right.isDown) {
+            this.player.setVelocityX(150);
+        } else {
+            this.player.setVelocityX(0);
+        }
+
+        // ----------------- OBJETOS ------------------
+
+        this.obstacles.children.entries.forEach(obs => {
+            if (obs.x < -50) {
+                obs.destroy();
+                this.score += gameConfig.scoring.distancePoints;
+                this.scoreText.setText(`Score: ${this.score}`);
+            }
+        });
+
+        this.collectibles.children.entries.forEach(col => {
+            if (col.x < -50) col.destroy();
+        });
+
+        // Spawn automático
+        const now = this.time.now;
+        if (now - this.lastSpawn > this.spawnRate / this.speedMultiplier) {
+            this.spawnObstacle(gameConfig);
+            this.spawnCollectible(gameConfig);
+            this.lastSpawn = now;
+            this.speedMultiplier += gameConfig.difficulty.speedIncrement;
+        }
+
+        // Colisão com obstáculo → game over
+        this.physics.overlap(this.player, this.obstacles, () => {
+            this.endGame();
+        });
+
+        // Pegou item
+        this.physics.overlap(this.player, this.collectibles, (player, collectible) => {
+            collectible.destroy();
+            this.score += gameConfig.scoring.collectiblePoints;
+            this.scoreText.setText(`Score: ${this.score}`);
+        });
+
+        // Caiu da tela
+        if (this.player.y > 600) {
+            this.endGame();
+        }
     }
-  );
 
-  this.physics.overlap(
-    this.player,
-    this.collectibles,
-    (player, collectible) => {
-      collectible.destroy();
-      this.score += gameConfig.scoring.collectiblePoints;
-      this.scoreText.setText(`Score: ${this.score}`);
+    // ---------------- SPAWN HELPERS ----------------
+
+    spawnObstacle(gameConfig) {
+        const y = Math.random() * 400 + 100;
+
+        const g = this.make.graphics({ x: 0, y: 0, add: false });
+        g.fillStyle(0xff6600, 1);
+        g.fillRect(0, 0, 40, 40);
+        g.generateTexture('obstacleTexture', 40, 40);
+        g.destroy();
+
+        const obstacle = this.physics.add.sprite(800, y, 'obstacleTexture');
+        obstacle.setVelocityX(-gameConfig.physics.obstacleSpeed);
+        this.obstacles.add(obstacle);
     }
-  );
 
-  if (this.player.y > 600) {
-    this.physics.pause();
-    this.gameActive = false;
-    this.add.text(250, 250, 'Game Over!', { fontSize: '64px', fill: '#ff0000' });
-    this.add.text(200, 350, `Final Score: ${this.score}`, {
-      fontSize: '32px',
-      fill: '#ffffff',
+    spawnCollectible(gameConfig) {
+        if (Math.random() > 0.7) {
+            const y = Math.random() * 400 + 100;
+
+            const g = this.make.graphics({ x: 0, y: 0, add: false });
+            g.fillStyle(0xffff00, 1);
+            g.fillCircle(15, 15, 12);
+            g.generateTexture('collectibleTexture', 30, 30);
+            g.destroy();
+
+            const collectible = this.physics.add.sprite(800, y, 'collectibleTexture');
+            collectible.setVelocityX(-gameConfig.physics.obstacleSpeed * 0.8);
+            this.collectibles.add(collectible);
+        }
+    }
+
+    endGame() {
+        this.physics.pause();
+        this.gameActive = false;
+
+        this.add.text(250, 250, 'Game Over!', { fontSize: '64px', fill: '#ff0000' });
+        this.add.text(200, 350, `Final Score: ${this.score}`, {
+            fontSize: '32px',
+            fill: '#ffffff'
+        });
+    }
+}
+
+
+// ---------------- INICIAR O JOGO ---------------- //
+
+export const startGame = (gameConfig, containerId) => {
+    return new Phaser.Game({
+        type: Phaser.AUTO,
+        parent: containerId,
+        width: 800,
+        height: 600,
+        physics: {
+            default: 'arcade',
+            arcade: {
+                gravity: { y: gameConfig.physics.gravity },
+                debug: false
+            }
+        },
+        scene: new GameScene(gameConfig)
     });
-  }
-};
-
-const spawnObstacle = function (gameConfig) {
-  const obstacleType = gameConfig.obstacles[Math.floor(Math.random() * gameConfig.obstacles.length)];
-  const y = Math.random() * 400 + 100;
-  
-  const obsGraphics = this.make.graphics({ x: 0, y: 0, add: false });
-  obsGraphics.fillStyle(0xff6600, 1);
-  obsGraphics.fillRect(0, 0, 40, 40);
-  obsGraphics.generateTexture('obstacleTexture', 40, 40);
-  obsGraphics.destroy();
-
-  const obstacle = this.physics.add.sprite(800, y, 'obstacleTexture');
-  obstacle.setVelocityX(-gameConfig.physics.obstacleSpeed);
-  this.obstacles.add(obstacle);
-};
-
-const spawnCollectible = function (gameConfig) {
-  if (Math.random() > 0.7) {
-    const y = Math.random() * 400 + 100;
-    
-    const colGraphics = this.make.graphics({ x: 0, y: 0, add: false });
-    colGraphics.fillStyle(0xffff00, 1);
-    colGraphics.fillCircle(15, 15, 12);
-    colGraphics.generateTexture('collectibleTexture', 30, 30);
-    colGraphics.destroy();
-
-    const collectible = this.physics.add.sprite(800, y, 'collectibleTexture');
-    collectible.setVelocityX(-gameConfig.physics.obstacleSpeed * 0.8);
-    this.collectibles.add(collectible);
-  }
-};
-
-export const startGame = (gameConfig, containerId = 'game-container') => {
-  const config = createGameConfig(gameConfig, containerId);
-  return new Phaser.Game(config);
 };

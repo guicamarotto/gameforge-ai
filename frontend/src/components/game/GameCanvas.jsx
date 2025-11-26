@@ -12,6 +12,11 @@ export function GameCanvas({ gameConfig, gameId }) {
 
       const game = startGame(gameConfig, 'game-container');
       gameRef.current.game = game;
+
+      setTimeout(() => {
+        const el = document.getElementById('game-container');
+        if (el) el.focus();
+      }, 200);
     }
 
     return () => {
@@ -26,6 +31,7 @@ export function GameCanvas({ gameConfig, gameId }) {
       <div
         id="game-container"
         ref={gameRef}
+        tabIndex={0}   // ADICIONAR ESTA LINHA
         style={{
           width: '100%',
           maxWidth: '800px',
