@@ -37,7 +37,7 @@ export function Home() {
   return (
     <div className="home">
       <header className="header">
-        <h1>í¾® GameForge AI</h1>
+        <h1>GameForge AI</h1>
         <p>Crie jogos com IA em tempo real</p>
       </header>
 
@@ -51,7 +51,7 @@ export function Home() {
                 onChange={(e) => setDescription(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleGenerate()}
                 placeholder="Descreva seu jogo..."
-                className="input"
+                className="input" 
                 disabled={loading}
               />
               <button
